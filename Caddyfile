@@ -1,0 +1,12 @@
+:{$PORT:80} {
+    root * /app
+    encode zstd gzip
+
+    route {
+        # Do not expose enquiry storage or deployment/configuration files.
+        @private path /storage /storage/* /.env /.env.* /.git /.git/* /.htaccess /README.md /Caddyfile /Dockerfile.vercel /vercel.json
+        respond @private "Not Found" 404
+
+        php_server
+    }
+}

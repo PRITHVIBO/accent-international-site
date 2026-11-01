@@ -1,0 +1,20 @@
+FROM dunglas/frankenphp:1-php8.4-alpine
+
+WORKDIR /app
+
+# Use PHP's production configuration.
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+# This project currently uses a root-level index.php.
+COPY index.php ./index.php
+COPY api ./api
+COPY assets ./assets
+
+# The current demo enquiry endpoint appends JSONL records here.
+# Vercel container files are ephemeral; use external storage for production.
+RUN mkdir -p /app/storage && chown -R www-data:www-data /app/storage
+
+COPY Caddyfile /etc/caddy/Caddyfile
+
+ENV PORT=80
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
